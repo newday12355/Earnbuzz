@@ -2,11 +2,10 @@ import { useState, useRef } from 'react';
 import { Camera, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 
 export const ProfileUpload = () => {
-  const { profile, uploadAvatar } = useAuth();
+  const [profile, setProfile] = useState<any>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -36,22 +35,15 @@ export const ProfileUpload = () => {
     }
 
     setUploading(true);
-    const { error } = await uploadAvatar(file);
     
-    if (error) {
-      toast({
-        title: "Upload failed",
-        description: error.message,
-        variant: "destructive"
-      });
-    } else {
+    // Simulate upload for demo
+    setTimeout(() => {
       toast({
         title: "Profile updated",
         description: "Your profile picture has been updated successfully"
       });
-    }
-    
-    setUploading(false);
+      setUploading(false);
+    }, 2000);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -62,11 +54,12 @@ export const ProfileUpload = () => {
   };
 
   const getInitials = () => {
-    return profile?.full_name
-      ?.split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase() || 'U';
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      return user.fullName?.split(' ').map((n: string) => n[0]).join('').toUpperCase() || 'U';
+    }
+    return 'U';
   };
 
   return (

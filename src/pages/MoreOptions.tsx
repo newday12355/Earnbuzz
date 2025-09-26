@@ -1,17 +1,14 @@
 import { ArrowLeft, User, Info, Download, Play, CreditCard, Crown, LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
 
 const MoreOptions = () => {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
   
   const handleLogout = async () => {
     // Clear all user data from localStorage including bonus status
     localStorage.removeItem('user');
     localStorage.removeItem('bonusClaimed');
     localStorage.removeItem('dashboardBalance');
-    await signOut();
     navigate("/login");
   };
 

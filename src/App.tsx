@@ -13,6 +13,11 @@ import TVRecharge from "./pages/TVRecharge";
 import BuyData from "./pages/BuyData";
 import Betting from "./pages/Betting";
 import Withdraw from "./pages/Withdraw";
+import WithdrawalAmount from "./pages/WithdrawalAmount";
+import ReferralRequirement from "./pages/ReferralRequirement";
+import WithdrawBankSelection from "./pages/WithdrawBankSelection";
+import WithdrawalConfirmation from "./pages/WithdrawalConfirmation";
+import WithdrawalReceipt from "./pages/WithdrawalReceipt";
 import WithdrawalSuccess from "./pages/WithdrawalSuccess";
 import PaymentNotConfirmed from "./pages/PaymentNotConfirmed";
 import FaircodePaymentSuccess from "./pages/FaircodePaymentSuccess";
@@ -45,6 +50,11 @@ const App = () => (
           <Route path="/buy-data" element={<BuyData />} />
           <Route path="/betting" element={<Betting />} />
           <Route path="/withdraw" element={<Withdraw />} />
+          <Route path="/withdrawal-amount" element={<WithdrawalAmount />} />
+          <Route path="/referral-requirement" element={<ReferralRequirement />} />
+          <Route path="/withdraw-bank-selection" element={<WithdrawBankSelection />} />
+          <Route path="/withdrawal-confirmation" element={<WithdrawalConfirmation />} />
+          <Route path="/withdrawal-receipt" element={<WithdrawalReceipt />} />
           <Route path="/withdrawal-success" element={<WithdrawalSuccess />} />
           <Route path="/payment-not-confirmed" element={<PaymentNotConfirmed />} />
           <Route path="/faircode-payment-success" element={<FaircodePaymentSuccess />} />

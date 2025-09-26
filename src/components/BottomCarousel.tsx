@@ -4,6 +4,7 @@ export const BottomCarousel = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const banners = [
+    "/src/assets/cbn-logo.jpeg",
     "/lovable-uploads/3a36162b-5f60-487d-989b-359d67cd1c0f.png",
     "/lovable-uploads/26c9dfb2-f522-417a-84ea-f18765dc02a8.png", 
     "/lovable-uploads/1333d6cb-a85c-4067-90ff-bc2f31355a49.png",

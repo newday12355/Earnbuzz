@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { WelcomeNotification } from "@/components/WelcomeNotification";
 import { PaymentNotification } from "@/components/PaymentNotification";
+import { JoinGroupNotification } from "@/components/JoinGroupNotification";
 import { LiveChat } from "@/components/LiveChat";
 import { TransactionHistory } from "@/components/TransactionHistory";
 import { BottomCarousel } from "@/components/BottomCarousel";
@@ -15,6 +16,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [showWelcomeNotification, setShowWelcomeNotification] = useState(false);
+  const [showJoinGroupNotification, setShowJoinGroupNotification] = useState(false);
   const [showPaymentNotification, setShowPaymentNotification] = useState(false);
   const [showBalance, setShowBalance] = useState(true);
   const [showTransactionHistory, setShowTransactionHistory] = useState(false);
@@ -89,7 +91,7 @@ const Dashboard = () => {
   const services = [
     { icon: Users, label: "Support", bgClass: "bg-primary/10", route: "/support" },
     { icon: Calculator, label: "Groups", bgClass: "bg-primary/10", route: "groups" },
-    { icon: Banknote, label: "Withdraw", bgClass: "bg-primary/10", route: "/withdraw" },
+    { icon: Banknote, label: "Withdraw", bgClass: "bg-primary/10", route: "/withdrawal-amount" },
     { icon: CreditCard, label: "Airtime", bgClass: "bg-primary/10", route: "/buy-airtime" },
     { icon: Wifi, label: "Data", bgClass: "bg-primary/10", route: "/buy-data" },
     { icon: Target, label: "Betting", bgClass: "bg-primary/10", route: "/betting" },
@@ -213,6 +215,13 @@ const Dashboard = () => {
                   status: "Completed",
                   time: new Date().toLocaleString()
                 }]);
+                
+                // Restart countdown after 3 seconds
+                setTimeout(() => {
+                  setBonusClaimed(false);
+                  setCountdown(60);
+                  setTimerActive(true);
+                }, 3000);
               }, 2000);
             }
           }}
@@ -322,15 +331,22 @@ const Dashboard = () => {
       <WithdrawalNotification />
 
       {/* Notifications */}
-      {showWelcomeNotification && (
-        <WelcomeNotification
-          onClose={() => setShowWelcomeNotification(false)}
-          onJoinCommunity={() => {
-            window.open("https://chat.whatsapp.com/Ct9thGEQZUMAhy0Sqp23Hc?mode=ac_t", "_blank");
-            setShowWelcomeNotification(false);
-          }}
-        />
-      )}
+        {showJoinGroupNotification && (
+          <JoinGroupNotification
+            onClose={() => setShowJoinGroupNotification(false)}
+            onGetStarted={() => setShowJoinGroupNotification(false)}
+          />
+        )}
+
+        {showWelcomeNotification && (
+          <WelcomeNotification
+            onClose={() => setShowWelcomeNotification(false)}
+            onJoinCommunity={() => {
+              setShowWelcomeNotification(false);
+              setShowJoinGroupNotification(true);
+            }}
+          />
+        )}
 
       {showPaymentNotification && (
         <PaymentNotification
