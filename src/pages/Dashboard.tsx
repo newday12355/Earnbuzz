@@ -19,10 +19,12 @@ const Dashboard = () => {
   const [showBalance, setShowBalance] = useState(true);
   const [showTransactionHistory, setShowTransactionHistory] = useState(false);
   const [showGroupModal, setShowGroupModal] = useState(false);
-  const [balance, setBalance] = useState(0);
+  const [balance, setBalance] = useState(5000);
   const [bonusClaimed, setBonusClaimed] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [bonuses, setBonuses] = useState<any[]>([]);
+  const [countdown, setCountdown] = useState(60);
+  const [timerActive, setTimerActive] = useState(true);
 
   // Check if user is logged in
   useEffect(() => {
@@ -37,6 +39,13 @@ const Dashboard = () => {
       if (bonusClaimedStatus === 'true' && currentBalance) {
         setBonusClaimed(true);
         setBalance(parseInt(currentBalance));
+        setTimerActive(false);
+        setCountdown(0);
+      } else {
+        setBalance(5000);
+        // Start countdown timer
+        setTimerActive(true);
+        setCountdown(60);
       }
     }
   }, [navigate]);
@@ -59,6 +68,23 @@ const Dashboard = () => {
       };
     }
   }, [user]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (timerActive && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown(prev => {
+          if (prev <= 1) {
+            setTimerActive(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+  }, [timerActive, countdown]);
 
   const services = [
     { icon: Users, label: "Support", bgClass: "bg-primary/10", route: "/support" },
@@ -142,6 +168,11 @@ const Dashboard = () => {
                 1
               </div>
             </div>
+            {timerActive && countdown > 0 && (
+              <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                {countdown}s
+              </div>
+            )}
             <button
               onClick={() => setShowBalance(!showBalance)}
               className="hover:bg-white/20 rounded-full p-1 transition-colors"
@@ -161,40 +192,49 @@ const Dashboard = () => {
         
         <Button 
           onClick={() => {
-            if (!bonusClaimed && !isClaiming) {
+            if (!bonusClaimed && !isClaiming && !timerActive && countdown === 0) {
               setIsClaiming(true);
               // Play bonus claim sound
               const audio = new Audio('data:audio/wav;base64,UklGRvIBAABXQVZFZm10IAAAAAAQAAABAAAAQB8AAEAfAAABAAgAZGF0YQoAAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJYfH8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ1Mp+DyvmEcBzuP1vLNeSsFJofF8N2QQAoUXrTp3aFQEQ==');
               audio.play().catch(() => {}); // Ignore errors if audio can't play
               
               setTimeout(() => {
-                setBalance(250000);
+                setBalance(prev => prev + 1000);
                 setBonusClaimed(true);
                 setIsClaiming(false);
                 // Store in localStorage so TransactionHistory can see it and persist until logout
-                localStorage.setItem('dashboardBalance', '250000');
+                localStorage.setItem('dashboardBalance', (balance + 1000).toString());
                 localStorage.setItem('bonusClaimed', 'true');
                 // Add bonus to state for red dot notification
                 setBonuses([{
                   id: 1,
                   description: "Welcome Bonus",
-                  amount: 250000,
+                  amount: 1000,
                   status: "Completed",
                   time: new Date().toLocaleString()
                 }]);
               }, 2000);
             }
           }}
-          disabled={bonusClaimed || isClaiming}
+          disabled={bonusClaimed || isClaiming || timerActive || countdown > 0}
           className={`w-full font-semibold py-3 rounded-full ${
             bonusClaimed 
               ? "bg-gray-400 text-gray-600 cursor-not-allowed" 
               : isClaiming
               ? "bg-yellow-500 text-white cursor-not-allowed"
+              : (timerActive || countdown > 0)
+              ? "bg-gray-400 text-gray-600 cursor-not-allowed"
               : "bg-white text-primary hover:bg-white/90"
           }`}
         >
-          {bonusClaimed ? "✅ Bonus Claimed" : isClaiming ? "⏳ Claiming..." : "🎁 Claim Bonus 🎁"}
+          {bonusClaimed 
+            ? "✅ Bonus Claimed" 
+            : isClaiming 
+            ? "⏳ Claiming..." 
+            : (timerActive || countdown > 0)
+            ? `⏰ Wait ${countdown}s`
+            : "🎁 Claim Bonus 🎁"
+          }
         </Button>
       </div>
 
