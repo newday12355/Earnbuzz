@@ -25,8 +25,9 @@ const Dashboard = () => {
   const [bonusClaimed, setBonusClaimed] = useState(false);
   const [isClaiming, setIsClaiming] = useState(false);
   const [bonuses, setBonuses] = useState<any[]>([]);
-  const [countdown, setCountdown] = useState(60);
-  const [timerActive, setTimerActive] = useState(true);
+  const [countdown, setCountdown] = useState(3540); // 59 minutes = 3540 seconds
+  const [timerActive, setTimerActive] = useState(false);
+  const [hasStartedClaiming, setHasStartedClaiming] = useState(false);
 
   // Check if user is logged in
   useEffect(() => {
@@ -35,19 +36,43 @@ const Dashboard = () => {
       navigate("/login");
     } else {
       setUser(JSON.parse(userData));
-      // Check if bonus was claimed in this session
-      const bonusClaimedStatus = localStorage.getItem('bonusClaimed');
+      // Check if claiming was started and restore timer state
+      const claimingStarted = localStorage.getItem('claimingStarted');
+      const timerStartTime = localStorage.getItem('timerStartTime');
       const currentBalance = localStorage.getItem('dashboardBalance');
-      if (bonusClaimedStatus === 'true' && currentBalance) {
-        setBonusClaimed(true);
+      
+      if (currentBalance) {
         setBalance(parseInt(currentBalance));
-        setTimerActive(false);
-        setCountdown(0);
       } else {
         setBalance(5000);
-        // Start countdown timer
-        setTimerActive(true);
-        setCountdown(60);
+      }
+      
+      if (claimingStarted === 'true' && timerStartTime) {
+        const startTime = parseInt(timerStartTime);
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const remaining = Math.max(0, 3540 - elapsed); // 59 minutes
+        
+        setHasStartedClaiming(true);
+        setCountdown(remaining);
+        
+        if (remaining > 0) {
+          setTimerActive(true);
+        } else {
+          setTimerActive(false);
+          // Auto-claim bonus if timer expired
+          setTimeout(() => {
+            setBalance(prev => {
+              const newBalance = prev + 1000;
+              localStorage.setItem('dashboardBalance', newBalance.toString());
+              return newBalance;
+            });
+            // Restart timer
+            const newStartTime = Date.now();
+            localStorage.setItem('timerStartTime', newStartTime.toString());
+            setCountdown(3540);
+            setTimerActive(true);
+          }, 1000);
+        }
       }
     }
   }, [navigate]);
@@ -79,6 +104,19 @@ const Dashboard = () => {
         setCountdown(prev => {
           if (prev <= 1) {
             setTimerActive(false);
+            // Auto-add 1000 to balance and restart timer
+            setTimeout(() => {
+              setBalance(currentBalance => {
+                const newBalance = currentBalance + 1000;
+                localStorage.setItem('dashboardBalance', newBalance.toString());
+                return newBalance;
+              });
+              // Restart timer immediately
+              const newStartTime = Date.now();
+              localStorage.setItem('timerStartTime', newStartTime.toString());
+              setCountdown(3540); // Reset to 59 minutes
+              setTimerActive(true);
+            }, 1000);
             return 0;
           }
           return prev - 1;
@@ -170,9 +208,9 @@ const Dashboard = () => {
                 1
               </div>
             </div>
-            {timerActive && countdown > 0 && (
+            {(timerActive && countdown > 0) || hasStartedClaiming && (
               <div className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                {countdown}s
+                {countdown > 3540 ? '59:00' : `${Math.floor(countdown / 60)}:${(countdown % 60).toString().padStart(2, '0')}`}
               </div>
             )}
             <button

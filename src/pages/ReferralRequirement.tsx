@@ -43,7 +43,7 @@ const ReferralRequirement = () => {
           <h2 className="text-xl font-bold text-foreground">Almost There!</h2>
           <p className="text-muted-foreground">
             To withdraw <span className="font-bold text-primary">₦{requestedAmount.toLocaleString()}</span>, 
-            you need to refer 5 people to FairMoney Pay.
+            you need to refer 5 people to FairMoney Pay. Minimum withdrawal amount is ₦100,000.
           </p>
         </div>
 
@@ -61,7 +61,7 @@ const ReferralRequirement = () => {
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
-              <span>Unlock withdrawal of any amount below ₦10,000</span>
+              <span>Unlock withdrawal of any amount below ₦100,000</span>
             </div>
           </div>
         </div>
