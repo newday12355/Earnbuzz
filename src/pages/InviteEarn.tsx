@@ -3,10 +3,31 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
 
 const InviteEarn = () => {
   const { toast } = useToast();
-  const referralLink = "https://fairmoney-pay2025ltds.netlify.app/";
+  const referralLink = "https://fairmoney-pay2025ltds.netlify.app/?ref=USER123"; // Example user ID or code
+
+  // State for tracking referrals
+  const [referrals, setReferrals] = useState(0);
+  const perReferral = 5000;
+
+  // Load saved referrals from localStorage (or API if available)
+  useEffect(() => {
+    const savedReferrals = parseInt(localStorage.getItem("referralCount") || "0", 10);
+    setReferrals(savedReferrals);
+  }, []);
+
+  // Simulate a successful referral (for testing)
+  const addReferral = () => {
+    const newCount = referrals + 1;
+    setReferrals(newCount);
+    localStorage.setItem("referralCount", newCount.toString());
+    toast({
+      description: `🎉 New referral added! Total: ${newCount}`,
+    });
+  };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(referralLink);
@@ -35,18 +56,21 @@ const InviteEarn = () => {
         <div className="flex flex-col items-center space-y-4">
           <Gift className="w-12 h-12" />
           <div className="text-center">
-            <div className="text-3xl font-bold">₦0</div>
+            <div className="text-3xl font-bold">₦{referrals * perReferral}</div>
             <div className="text-sm opacity-90">Total Earnings</div>
           </div>
           <div className="flex justify-between w-full text-center">
             <div>
-              <div className="text-2xl font-bold">0</div>
+              <div className="text-2xl font-bold">{referrals}</div>
               <div className="text-sm opacity-90">Referrals</div>
             </div>
             <div>
-              <div className="text-2xl font-bold">₦6,500</div>
+              <div className="text-2xl font-bold">₦{perReferral.toLocaleString()}</div>
               <div className="text-sm opacity-90">Per Referral</div>
             </div>
+          </div>
+          <div className="text-sm mt-2">
+            🎯 Target: <span className="font-bold">5 Referrals</span> or more
           </div>
         </div>
       </div>
@@ -71,13 +95,15 @@ const InviteEarn = () => {
             <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center text-primary font-bold text-sm">
               3
             </div>
-            <span className="text-sm text-muted-foreground">You earn ₦6,500 for each successful referral automatically</span>
+            <span className="text-sm text-muted-foreground">
+              You earn ₦{perReferral.toLocaleString()} for each successful referral automatically
+            </span>
           </div>
         </div>
       </div>
 
       {/* Referral Link */}
-      <div className="bg-card rounded-2xl p-6">
+      <div className="bg-card rounded-2xl p-6 mb-6">
         <h2 className="text-lg font-semibold text-foreground mb-4">Your Referral Link</h2>
         <div className="flex space-x-2 mb-4">
           <Input value={referralLink} readOnly className="flex-1" />
@@ -90,6 +116,11 @@ const InviteEarn = () => {
           Share on WhatsApp
         </Button>
       </div>
+
+      {/* Simulate referral button (testing only, remove in production) */}
+      <Button onClick={addReferral} className="w-full mt-4" variant="secondary">
+        ➕ Simulate Referral (Test Only)
+      </Button>
     </div>
   );
 };
