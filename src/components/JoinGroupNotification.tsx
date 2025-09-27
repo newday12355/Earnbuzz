@@ -73,6 +73,14 @@ export const JoinGroupNotification = ({ onClose, onGetStarted }: JoinGroupNotifi
             >
               Get Started
             </Button>
+            
+            <Button
+              onClick={onClose}
+              variant="ghost"
+              className="w-full text-white hover:bg-white/10 font-medium py-3 rounded-full"
+            >
+              Maybe Later
+            </Button>
           </div>
         </div>
       </div>
