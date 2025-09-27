@@ -14,13 +14,107 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          balance: number | null
+          created_at: string
+          device_id: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          referral_code: string
+          referred_by: string | null
+          total_referrals: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number | null
+          created_at?: string
+          device_id?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          referral_code?: string
+          referred_by?: string | null
+          total_referrals?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number | null
+          created_at?: string
+          device_id?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          referral_code?: string
+          referred_by?: string | null
+          total_referrals?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_referred_by_fkey"
+            columns: ["referred_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referred_id: string
+          referrer_id: string
+          reward_amount: number | null
+          status: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referred_id: string
+          referrer_id: string
+          reward_amount?: number | null
+          status?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referred_id?: string
+          referrer_id?: string
+          reward_amount?: number | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      process_referral: {
+        Args: { device_id_input?: string; referral_code_input: string }
+        Returns: Json
+      }
     }
     Enums: {
       [_ in never]: never
