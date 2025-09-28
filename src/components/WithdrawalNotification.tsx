@@ -1,75 +1,167 @@
-import { useState, useEffect } from "react";
-import { CheckCircle, X } from "lucide-react";
+"use client"
 
-interface WithdrawalData {
-  name: string;
-  amount: string;
-  time: string;
+import { useState, useEffect, useRef } from "react"
+import { X, ArrowDownLeft } from "lucide-react"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { usePathname } from "next/navigation"
+
+interface Notification {
+  id: string
+  name: string
+  amount: number
+  source: "signup" | "referral" | "loan" | "spin"
 }
 
-export const WithdrawalNotification = () => {
-  const [currentNotification, setCurrentNotification] = useState<WithdrawalData | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+export function WithdrawalNotifications() {
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const usedNamesRef = useRef<Set<string>>(new Set())
+  const pathname = usePathname()
+  const shouldShowNotifications = pathname === "/" || pathname === "/dashboard"
 
-  const withdrawals: WithdrawalData[] = [
-    { name: "John Adebayo", amount: "₦150,000", time: "2 mins ago" },
-    { name: "Sarah Okafor", amount: "₦200,000", time: "5 mins ago" },
-    { name: "David Emeka", amount: "₦100,000", time: "8 mins ago" },
-    { name: "Grace Amina", amount: "₦250,000", time: "12 mins ago" },
-    { name: "Michael Tunde", amount: "₦180,000", time: "15 mins ago" },
-    { name: "Blessing Kemi", amount: "₦220,000", time: "18 mins ago" },
-    { name: "Ibrahim Hassan", amount: "₦130,000", time: "22 mins ago" },
-    { name: "Chioma Nkem", amount: "₦190,000", time: "25 mins ago" },
-  ];
+  const nigerianNames = {
+    igbo: ["Chinedu","Adaora","Emeka","Ngozi","Chioma","Obinna","Amara"],
+    hausa: ["Abdullahi","Aisha","Ibrahim","Fatima","Musa","Zainab","Usman"],
+    yoruba: ["Adebayo","Folake","Olumide","Bukola","Babatunde","Yetunde"],
+    middlebelt: ["Daniel","Grace","Samuel","Joy","David","Faith"],
+    southsouth: ["Ekaette","Udeme","Ime","Aniekan","Emem","Uduak"],
+    general: ["Ahmed","Fatimah","Rasheed","Kemi","Tolu","Bola","Kunle"]
+  }
+
+  const getRandomName = () => {
+    const allNames = Object.values(nigerianNames).flat()
+    if (allNames.length === 0) return "User"
+
+    const unused = allNames.filter(name => !usedNamesRef.current.has(name))
+    const available = unused.length > 0 ? unused : allNames
+
+    const selected = available[Math.floor(Math.random() * available.length)]
+    usedNamesRef.current.add(selected)
+    return selected
+  }
+
+  const loanAmounts = [
+    200000,210000,220000,230000,240000,250000,260000,270000,280000,290000,
+    300000,400000,450000,500000,550000,600000,650000,700000,750000,800000,
+    850000,900000,950000,1000000
+  ]
+  const referralAmounts = [
+    100000,110000,120000,130000,140000,150000,160000,170000
+  ]
+  const spinAmounts = [
+    100000,120000,150000,180000,200000,250000,300000 // ✅ all 100k+
+  ]
+  const SIGNUP_AMOUNT = 1800000 // ✅ fixed at 1.8M
+
+  // pick source with 20% chance for spin
+  const getSourceAndAmount = () => {
+    const random = Math.random()
+    if (random < 0.2) {
+      return { source: "spin" as const, amount: spinAmounts[Math.floor(Math.random() * spinAmounts.length)] }
+    }
+
+    const sources: ("signup" | "referral" | "loan")[] = ["signup", "referral", "loan"]
+    const source = sources[Math.floor(Math.random() * sources.length)]
+
+    if (source === "signup") return { source, amount: SIGNUP_AMOUNT }
+    if (source === "referral") return { source, amount: referralAmounts[Math.floor(Math.random() * referralAmounts.length)] }
+    return { source, amount: loanAmounts[Math.floor(Math.random() * loanAmounts.length)] }
+  }
+
+  const DISPLAY_MS = 7000 // show each notification for 7s
+  const INITIAL_DELAY_MS = 3000 // first one at 3s
+
+  const createNotification = () => {
+    const name = getRandomName()
+    const { source, amount } = getSourceAndAmount()
+
+    const notification: Notification = {
+      id: Date.now().toString(),
+      name,
+      amount,
+      source
+    }
+
+    setNotifications([notification]) // Only one at a time
+
+    setTimeout(() => {
+      setNotifications([])
+    }, DISPLAY_MS)
+  }
 
   useEffect(() => {
-    let notificationIndex = 0;
+    if (!shouldShowNotifications) {
+      setNotifications([])
+      return
+    }
 
-    const showNotification = () => {
-      setCurrentNotification(withdrawals[notificationIndex]);
-      setIsVisible(true);
+    const first = setTimeout(createNotification, INITIAL_DELAY_MS)
 
-      // Hide after 2 seconds
-      setTimeout(() => {
-        setIsVisible(false);
-        
-        // Show next notification after 2 seconds
-        setTimeout(() => {
-          notificationIndex = (notificationIndex + 1) % withdrawals.length;
-          showNotification();
-        }, 2000);
-      }, 2000);
-    };
+    let timeoutId: NodeJS.Timeout
+    const scheduleNext = () => {
+      const nextDelay = Math.floor(Math.random() * (20000 - 10000 + 1)) + 10000 // random 10–20s
+      timeoutId = setTimeout(() => {
+        createNotification()
+        scheduleNext()
+      }, nextDelay)
+    }
 
-    // Start showing notifications after 3 seconds
-    const initialTimer = setTimeout(() => {
-      showNotification();
-    }, 3000);
+    scheduleNext()
 
     return () => {
-      clearTimeout(initialTimer);
-    };
-  }, []);
+      clearTimeout(first)
+      clearTimeout(timeoutId)
+    }
+  }, [shouldShowNotifications])
 
-  if (!currentNotification || !isVisible) return null;
+  const removeNotification = () => setNotifications([])
+
+  const getSourceLabel = (source: Notification["source"]) => {
+    if (source === "signup") return "from signup bonus 💰"
+    if (source === "loan") return "from loan 💰"
+    if (source === "spin") return "from Spin & Win 🎡"
+    return "from referral 🫂"
+  }
+
+  if (!shouldShowNotifications) return null
 
   return (
-    <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 animate-fade-in">
-      <div className="bg-green-500 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-3 min-w-80">
-        <CheckCircle className="w-5 h-5 flex-shrink-0" />
-        <div className="flex-1">
-          <p className="font-semibold text-sm">{currentNotification.name}</p>
-          <p className="text-xs opacity-90">
-            Successfully withdrew {currentNotification.amount} • {currentNotification.time}
-          </p>
-        </div>
-        <button
-          onClick={() => setIsVisible(false)}
-          className="hover:bg-green-600 rounded-full p-1 transition-colors"
+    <div className="fixed top-4 right-4 z-50 max-w-sm">
+      {notifications.map(notification => (
+        <Card
+          key={notification.id}
+          className="p-4 bg-white border border-purple-200 shadow-lg animate-in slide-in-from-right-full duration-300"
         >
-          <X className="w-4 h-4" />
-        </button>
-      </div>
+          <div className="flex items-start justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                <ArrowDownLeft className="h-5 w-5 text-purple-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-gray-900">
+                  {notification.name} just withdrew
+                </p>
+                <p className="text-lg font-bold text-purple-600">
+                  ₦{notification.amount.toLocaleString()}
+                </p>
+                <p className="text-xs font-semibold text-gray-800">
+                  {getSourceLabel(notification.source)}
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-gray-400 hover:text-gray-600"
+              onClick={removeNotification}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
+        </Card>
+      ))}
     </div>
-  );
-};
+  )
+}
+
+export default WithdrawalNotifications
