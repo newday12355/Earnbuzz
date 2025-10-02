@@ -137,7 +137,7 @@ export default function DashboardPage() {
   const menuItems: MenuItem[] = [
     { name: "Buy Paykey", icon: CreditCard, link: "/buy-paykey", color: "text-orange-600", bgColor: "" },
     { name: "Loan", emoji: "💳", link: "/loan", color: "text-purple-600", bgColor: "" },
-    { name: "Pay Bills", emoji: "💰", link: "/pay-bills", color: "text-green-600", bgColor: "" },
+    { name: "Pay Bills", emoji: "💰", link: "/pay-bill", color: "text-green-600", bgColor: "" },
     { name: "Investment", emoji: "📈", link: "/investment", color: "text-violet-600", bgColor: "" },
     { name: "Earn More", emoji: "🎁", link: "/earn-more", color: "text-yellow-600", bgColor: "" },
     { name: "Refer & Earn", icon: Gift, link: "/refer", color: "text-pink-600", bgColor: "" },
