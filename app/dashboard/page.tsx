@@ -6,10 +6,10 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { CreditCard, History, Home, Bell, User, Trophy, Gift, Clock } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { WelcomePopup } from "@/components/welcome-popup"
 import { DashboardImageCarousel } from "@/components/dashboard-image-carousel"
 import { WithdrawalNotification } from "@/components/withdrawal-notification"
 import { ReferralCard } from "@/components/referral-card"
+import { useToast } from "@/hooks/use-toast"
 
 interface UserData {
   name: string
@@ -34,53 +34,59 @@ interface MenuItem {
 
 export default function DashboardPage() {
   const router = useRouter()
+  const { toast } = useToast()
   const [userData, setUserData] = useState<UserData | null>(null)
-  const [showWelcomePopup, setShowWelcomePopup] = useState(false)
   const [showBalance, setShowBalance] = useState(true)
   const [showWithdrawalNotification, setShowWithdrawalNotification] = useState(false)
   const [balance, setBalance] = useState(5000)
-  const [timeRemaining, setTimeRemaining] = useState(60) // 60 seconds = 1 minute
+  const [timeRemaining, setTimeRemaining] = useState(300)
   const [canClaim, setCanClaim] = useState(false)
-
-  const handleCloseWelcomePopup = useCallback(() => {
-    setShowWelcomePopup(false)
-    localStorage.setItem("earnbuzz-welcome-popup-shown", "true")
-  }, [])
+  const [isCounting, setIsCounting] = useState(true)
 
   const handleCloseWithdrawalNotification = useCallback(() => {
     setShowWithdrawalNotification(false)
   }, [])
 
   useEffect(() => {
+    if (!isCounting) return
+
     const timer = setInterval(() => {
       setTimeRemaining((prev) => {
         if (prev <= 1) {
           setCanClaim(true)
-          return 60 // Reset to 60 seconds
+          setIsCounting(false)
+          return 0
         }
         return prev - 1
       })
     }, 1000)
 
     return () => clearInterval(timer)
-  }, [])
+  }, [isCounting])
 
   const handleClaim = () => {
     if (canClaim) {
       setBalance((prev) => prev + 1000)
       setCanClaim(false)
-      setTimeRemaining(60)
+      setTimeRemaining(300)
+      setIsCounting(true)
+
+      toast({
+        title: "Reward Claimed! 🎉",
+        description: "₦1,000 has been added to your balance",
+        duration: 3000,
+      })
 
       if (userData) {
         const updatedUser = { ...userData, balance: balance + 1000 }
-        localStorage.setItem("earnbuzz-user", JSON.stringify(updatedUser))
+        localStorage.setItem("tivexx-user", JSON.stringify(updatedUser))
         setUserData(updatedUser)
       }
     }
   }
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("earnbuzz-user")
+    const storedUser = localStorage.getItem("tivexx-user")
 
     if (!storedUser) {
       router.push("/login")
@@ -94,17 +100,12 @@ export default function DashboardPage() {
     }
 
     if (!user.userId) {
-      user.userId = `EB${Math.random().toString(36).substr(2, 9).toUpperCase()}`
+      user.userId = `TX${Math.random().toString(36).substr(2, 9).toUpperCase()}`
     }
-    localStorage.setItem("earnbuzz-user", JSON.stringify(user))
+    localStorage.setItem("tivexx-user", JSON.stringify(user))
 
     setUserData(user)
     setBalance(user.balance)
-
-    const welcomePopupShown = localStorage.getItem("earnbuzz-welcome-popup-shown")
-    if (!welcomePopupShown) {
-      setShowWelcomePopup(true)
-    }
 
     const notificationInterval = setInterval(() => {
       setShowWithdrawalNotification(true)
@@ -137,14 +138,14 @@ export default function DashboardPage() {
   const menuItems: MenuItem[] = [
     { name: "Buy Paykey", icon: CreditCard, link: "/buy-paykey", color: "text-orange-600", bgColor: "" },
     { name: "Loan", emoji: "💳", link: "/loan", color: "text-purple-600", bgColor: "" },
-    { name: "Pay Bills", emoji: "💰", link: "/pay-bill", color: "text-green-600", bgColor: "" },
+    { name: "Pay Bills", emoji: "💰", link: "/pay-bills", color: "text-green-600", bgColor: "" },
     { name: "Investment", emoji: "📈", link: "/investment", color: "text-violet-600", bgColor: "" },
     { name: "Earn More", emoji: "🎁", link: "/earn-more", color: "text-yellow-600", bgColor: "" },
     { name: "Refer & Earn", icon: Gift, link: "/refer", color: "text-pink-600", bgColor: "" },
     {
       name: "Channel",
       emoji: "✈️",
-      link: "https://t.me/Earnbuzzcomunity",
+      link: "https://t.me/Tivexxcommunity",
       external: true,
       color: "text-blue-500",
       bgColor: "",
@@ -172,13 +173,9 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen pb-4 bg-gradient-to-b from-[#fff5f0] to-[#fff0e6]">
-      {showWelcomePopup && userData && (
-        <WelcomePopup userName={userData.name.split(" ")[0]} onClose={handleCloseWelcomePopup} />
-      )}
-
       {showWithdrawalNotification && <WithdrawalNotification onClose={handleCloseWithdrawalNotification} />}
 
-      <div className="text-white rounded-xl p-5 bg-slate-700 shadow-md border-0 px-5 py-2.5 mx-2.5 mt-8 mb-4">
+      <div className="text-white rounded-xl p-5 bg-gradient-to-br from-gray-900 via-green-900 to-black shadow-md border-0 px-5 py-2.5 mx-2.5 mt-8 mb-4">
         <div className="flex items-center justify-between mb-1">
           <div className="flex items-center gap-2">
             <div className="w-11 h-11 rounded-full bg-white flex items-center justify-center shadow-md overflow-hidden">
@@ -189,12 +186,12 @@ export default function DashboardPage() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="font-semibold text-xl text-orange-700">{userData.name.charAt(0)}</span>
+                <span className="font-semibold text-xl text-orange-700">{userData?.name.charAt(0)}</span>
               )}
             </div>
             <div>
               <div className="font-medium text-lg">
-                Hi, {userData.name.split(" ")[0]} <span className="ml-1">👋</span>
+                Hi, {userData?.name.split(" ")[0]} <span className="ml-1">👋</span>
               </div>
               <div className="text-sm text-gray-200">Welcome back!</div>
             </div>
@@ -255,25 +252,26 @@ export default function DashboardPage() {
             </button>
           </div>
           <div className="text-sm text-orange-200 mt-1">
-            <span className="font-medium">User ID:</span> {userData.userId}
+            <span className="font-medium">User ID:</span> {userData?.userId}
           </div>
         </div>
 
         <div className="mt-4 bg-white/10 backdrop-blur-sm rounded-xl p-4">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <Clock className="h-5 w-5 text-orange-300" />
+              <Clock className="h-5 w-5 text-green-300" />
               <span className="text-sm font-medium">Next Reward</span>
             </div>
-            <span className="text-lg font-bold text-orange-300">{formatTime(timeRemaining)}</span>
+            <span className="text-lg font-bold text-green-300">{formatTime(timeRemaining)}</span>
           </div>
           <Button
             onClick={handleClaim}
             disabled={!canClaim}
             className={`w-full ${
               canClaim ? "bg-green-500 hover:bg-green-600" : "bg-gray-400 cursor-not-allowed"
-            } text-white font-semibold py-3 rounded-lg transition-all`}
+            } text-white font-semibold py-3 rounded-lg transition-all flex items-center justify-center gap-2`}
           >
+            <Gift className="h-5 w-5" />
             {canClaim ? "Claim ₦1,000" : `Wait ${formatTime(timeRemaining)}`}
           </Button>
         </div>

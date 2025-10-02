@@ -18,8 +18,8 @@ export default function LoginPage() {
   const [error, setError] = useState("")
 
   const handleWhatsAppSupport = () => {
-    const phoneNumber = "2349059089490" // Updated to UK number without +
-    const message = encodeURIComponent("hello, am from momo credit.")
+    const phoneNumber = "2349059089490"
+    const message = encodeURIComponent("hello, am from Tivexx.")
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
     window.open(whatsappUrl, "_blank")
   }
@@ -30,7 +30,7 @@ export default function LoginPage() {
     setError("")
 
     // Get registered users from localStorage
-    const registeredUsers = localStorage.getItem("momo-credit-registered-users")
+    const registeredUsers = localStorage.getItem("tivexx-registered-users")
     const users = registeredUsers ? JSON.parse(registeredUsers) : []
 
     // Check if user exists with matching email and password
@@ -38,12 +38,12 @@ export default function LoginPage() {
 
     if (user) {
       localStorage.setItem(
-        "momo-credit-user",
+        "tivexx-user",
         JSON.stringify({
           name: user.name,
           email: user.email,
-          balance: 180000,
-          weeklyRewards: 180000,
+          balance: 5000,
+          weeklyRewards: 5000,
           hasMomoNumber: false,
         }),
       )
@@ -61,15 +61,17 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#fff5f0] relative">
-      {/* Main content container */}
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 relative">
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-md flex flex-col items-center gap-8">
-          <div className="animate-fade-in">
+          <div className="animate-bounce">
             <Logo className="w-64 mb-4" />
           </div>
 
-          <h1 className="text-2xl font-semibold text-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <h1
+            className="text-2xl font-semibold text-center text-white animate-fade-in"
+            style={{ animationDelay: "0.3s" }}
+          >
             Login to continue
           </h1>
 
@@ -87,7 +89,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-14 rounded-full bg-white px-6 border border-gray-200"
+                className="h-14 rounded-full bg-white/90 px-6 border border-purple-300"
               />
 
               <Input
@@ -96,26 +98,27 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="h-14 rounded-full bg-white px-6 border border-gray-200"
+                className="h-14 rounded-full bg-white/90 px-6 border border-purple-300"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full h-14 rounded-full bg-black hover:bg-gray-800 text-white text-lg"
+              className="w-full h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white text-lg"
               disabled={loading}
             >
               {loading ? "Logging in..." : "Login"}
             </Button>
           </form>
 
-          <p className="text-center text-orange-600">
-            <Link href="/register">Don&apos;t have an account? Register</Link>
+          <p className="text-center text-orange-300">
+            <Link href="/register" className="hover:text-orange-200">
+              Don&apos;t have an account? Register
+            </Link>
           </p>
         </div>
       </div>
 
-      {/* WhatsApp button fixed to bottom left */}
       <div className="fixed bottom-6 left-6">
         <button
           onClick={handleWhatsAppSupport}

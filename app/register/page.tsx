@@ -9,8 +9,6 @@ import { Logo } from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Copy, CheckCircle2 } from "lucide-react"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -21,9 +19,6 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [referralCode, setReferralCode] = useState("")
-  const [registrationSuccess, setRegistrationSuccess] = useState(false)
-  const [newUserData, setNewUserData] = useState<any>(null)
-  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     const refCode = searchParams.get("ref")
@@ -34,7 +29,7 @@ export default function RegisterPage() {
 
   const handleWhatsAppSupport = () => {
     const phoneNumber = "2349059089490"
-    const message = encodeURIComponent("hello, am from momo credit.")
+    const message = encodeURIComponent("hello, am from Tivexx.")
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${message}`
     window.open(whatsappUrl, "_blank")
   }
@@ -64,24 +59,22 @@ export default function RegisterPage() {
         throw new Error(data.error || "Registration failed")
       }
 
-      // Store user data in localStorage for the app
       const userData = {
         id: data.user.id,
         name: data.user.name,
         email: data.user.email,
-        balance: 180000,
+        balance: 5000,
         userId: data.user.referral_code,
         hasMomoNumber: false,
         level: "Basic",
         referralCode: data.user.referral_code,
       }
 
-      localStorage.setItem("earnbuzz-user", JSON.stringify(userData))
-      localStorage.removeItem("earnbuzz-welcome-popup-shown")
+      localStorage.setItem("tivexx-user", JSON.stringify(userData))
+      localStorage.removeItem("tivexx-welcome-popup-shown")
 
-      // Show success screen with referral code
-      setNewUserData(data.user)
-      setRegistrationSuccess(true)
+      // Redirect straight to welcome page
+      router.push("/welcome")
     } catch (error: any) {
       console.error("[v0] Registration error:", error)
       setError(error.message || "Registration failed. Please try again.")
@@ -90,96 +83,18 @@ export default function RegisterPage() {
     }
   }
 
-  const handleCopyReferralCode = () => {
-    if (newUserData?.referral_code) {
-      navigator.clipboard.writeText(newUserData.referral_code)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }
-  }
-
-  const handleCopyReferralLink = () => {
-    if (newUserData?.referral_code) {
-      const link = `https://earnbuzz.netlify.app/register?ref=${newUserData.referral_code}`
-      navigator.clipboard.writeText(link)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    }
-  }
-
-  if (registrationSuccess && newUserData) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gradient-to-b from-green-50 to-white p-6">
-        <div className="flex-1 flex flex-col items-center justify-center max-w-md mx-auto w-full">
-          <div className="mb-8 text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle2 className="h-12 w-12 text-green-600" />
-            </div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-2">Welcome to EarnBuzz!</h1>
-            <p className="text-gray-600">Your account has been created successfully</p>
-          </div>
-
-          <Card className="w-full bg-white shadow-lg border-green-200">
-            <CardHeader className="bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-t-lg">
-              <CardTitle className="text-center">Your Referral Code</CardTitle>
-            </CardHeader>
-            <CardContent className="p-6 space-y-4">
-              <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <p className="text-sm text-gray-600 mb-2">Share this code to earn rewards</p>
-                <div className="text-3xl font-bold text-green-600 tracking-wider mb-3">{newUserData.referral_code}</div>
-                <Button
-                  onClick={handleCopyReferralCode}
-                  variant="outline"
-                  className="w-full border-green-300 text-green-700 hover:bg-green-50 bg-transparent"
-                >
-                  <Copy className="h-4 w-4 mr-2" />
-                  {copied ? "Copied!" : "Copy Code"}
-                </Button>
-              </div>
-
-              <div className="bg-green-50 rounded-lg p-4">
-                <p className="text-sm text-gray-700 mb-2">Your Referral Link:</p>
-                <div className="bg-white rounded px-3 py-2 text-xs text-gray-600 break-all mb-2">
-                  https://earnbuzz.netlify.app/register?ref={newUserData.referral_code}
-                </div>
-                <Button
-                  onClick={handleCopyReferralLink}
-                  variant="outline"
-                  size="sm"
-                  className="w-full border-green-300 text-green-700 hover:bg-green-50 bg-transparent"
-                >
-                  <Copy className="h-3 w-3 mr-2" />
-                  Copy Link
-                </Button>
-              </div>
-
-              <div className="bg-orange-50 rounded-lg p-4 text-center">
-                <p className="text-sm text-orange-800 font-semibold">🎁 Earn ₦500 for every friend you refer!</p>
-              </div>
-
-              <Button
-                onClick={() => router.push("/welcome")}
-                className="w-full bg-green-600 hover:bg-green-700 text-white"
-              >
-                Continue to Dashboard
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen flex flex-col bg-[#fff5f0] relative">
-      {/* Main content container */}
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 relative">
       <div className="flex-1 flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-md flex flex-col items-center gap-8">
           <div className="animate-fade-in">
             <Logo className="w-64 mb-4" />
           </div>
 
-          <h1 className="text-2xl font-semibold text-center animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <h1
+            className="text-2xl font-semibold text-center text-white animate-fade-in"
+            style={{ animationDelay: "0.3s" }}
+          >
             Register to continue
           </h1>
 
@@ -205,7 +120,7 @@ export default function RegisterPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                className="h-14 rounded-full bg-white px-6 border border-gray-200"
+                className="h-14 rounded-full bg-white/90 px-6 border border-purple-300"
               />
 
               <Input
@@ -214,7 +129,7 @@ export default function RegisterPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="h-14 rounded-full bg-white px-6 border border-gray-200"
+                className="h-14 rounded-full bg-white/90 px-6 border border-purple-300"
               />
 
               <Input
@@ -223,7 +138,7 @@ export default function RegisterPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="h-14 rounded-full bg-white px-6 border border-gray-200"
+                className="h-14 rounded-full bg-white/90 px-6 border border-purple-300"
               />
 
               <Input
@@ -231,26 +146,27 @@ export default function RegisterPage() {
                 placeholder="Referral Code (Optional)"
                 value={referralCode}
                 onChange={(e) => setReferralCode(e.target.value.toUpperCase())}
-                className="h-14 rounded-full bg-white px-6 border border-gray-200"
+                className="h-14 rounded-full bg-white/90 px-6 border border-purple-300"
               />
             </div>
 
             <Button
               type="submit"
-              className="w-full h-14 rounded-full bg-black hover:bg-gray-800 text-white text-lg"
+              className="w-full h-14 rounded-full bg-orange-600 hover:bg-orange-700 text-white text-lg"
               disabled={loading}
             >
               {loading ? "Registering..." : "Register"}
             </Button>
           </form>
 
-          <p className="text-center text-orange-600">
-            <Link href="/login">Already have an account? Login</Link>
+          <p className="text-center text-orange-300">
+            <Link href="/login" className="hover:text-orange-200">
+              Already have an account? Login
+            </Link>
           </p>
         </div>
       </div>
 
-      {/* WhatsApp button fixed to bottom left */}
       <div className="fixed bottom-6 left-6">
         <button
           onClick={handleWhatsAppSupport}

@@ -29,7 +29,7 @@ export default function ReferPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("earnbuzz-user")
+    const storedUser = localStorage.getItem("tivexx-user")
     if (!storedUser) {
       router.push("/login")
       return
@@ -67,8 +67,8 @@ export default function ReferPage() {
   }
 
   const referralLink = userData
-    ? `https://earnbuzz.netlify.app/register?ref=${userData.referral_code}`
-    : "https://earnbuzz.netlify.app/register"
+    ? `https://tivexx9ja.vercel.app/register?ref=${userData.referral_code}`
+    : "https://tivexx9ja.vercel.app/register"
 
   const referralCode = userData?.referral_code || "Loading..."
 
@@ -79,7 +79,7 @@ export default function ReferPage() {
   }
 
   const handleWhatsAppShare = () => {
-    const message = `Hey! 👋\n\nJoin me on EarnBuzz and start earning money today! 💰\n\nUse my referral code: ${referralCode}\n\nSign up here: ${referralLink}\n\n🎁 Get bonus rewards when you join!`
+    const message = `Hey! 👋\n\nJoin me on Tivexx and start earning money today! 💰\n\nUse my referral code: ${referralCode}\n\nSign up here: ${referralLink}\n\n🎁 Get bonus rewards when you join!`
     const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, "_blank")
   }
