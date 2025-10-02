@@ -1,0 +1,142 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .animate-slide-in-right {
+    animation: slideInRight 0.5s ease-out forwards;
+  }
+
+  .animate-slide-in-left {
+    animation: slideInLeft 0.5s ease-out forwards;
+  }
+
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+}
+
+/* Smooth input fields styling */
+input,
+textarea,
+select {
+  border-color: #e2e8f0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: border-color 0.2s ease-in-out;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: #ea580c !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px rgba(234, 88, 12, 0.1) !important;
+}
+
+/* Smooth curved input fields styling */
+input,
+textarea,
+select,
+.input,
+[type="text"],
+[type="email"],
+[type="password"],
+[type="number"],
+[type="tel"],
+[type="url"],
+[type="search"] {
+  border-radius: 1rem !important; /* Smooth curves for all inputs */
+  border-color: #e2e8f0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.input:focus,
+[type="text"]:focus,
+[type="email"]:focus,
+[type="password"]:focus,
+[type="number"]:focus,
+[type="tel"]:focus,
+[type="url"]:focus,
+[type="search"]:focus {
+  border-color: #ea580c !important;
+  outline: none !important;
+  box-shadow: 0 0 0 1px rgba(234, 88, 12, 0.1) !important;
+}
+
+/* Apply rounded corners to shadcn/ui Input component */
+.rounded-md {
+  border-radius: 1rem !important;
+}
+
+/* Remove black outlines on focus for all elements */
+* {
+  outline: none !important;
+}
+
+/* Smooth rounded buttons in popups and modals */
+.fixed button,
+[role="dialog"] button,
+.modal button,
+.popup button,
+.dialog button {
+  border-radius: 9999px !important; /* Full rounded for buttons in popups */
+  transition: all 0.2s ease-in-out;
+}
+
+/* Ensure all confirmation dialogs and popups have rounded corners */
+.fixed > div,
+[role="dialog"],
+.modal,
+.popup,
+.dialog {
+  border-radius: 1rem !important;
+  overflow: hidden;
+}
+
+/* Dark theme balance card styles */
+.bg-dark-orange {
+  background-color: #9a3412;
+}
+
+.bg-dark-orange-light {
+  background-color: #c2410c;
+}
+
+.bg-dark-orange-light:hover {
+  background-color: #ea580c;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
